@@ -22,10 +22,7 @@ public class Donor implements Runnable {
 			try{
 				int waiting = time.nextInt(25)+5;	//czeka od 0 do 30s na rejestracje
 				TimeUnit.SECONDS.sleep(waiting);
-				while (!Chairman.giveItem(this)){ //jesli kolejka zarejestrowanych przedmiotow jest pelna czeka i probuje ponownie
-					TimeUnit.SECONDS.sleep(5);
-					//System.out.println(name + "says: Kolejka pelna");
-				}
+				Chairman.giveItem(this);
 			}
 			catch(InterruptedException e){
 				Chairman.printer.lock();

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -10,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Chairman implements Runnable{
 
 	MarketManager manager;
-	private static List<String> items = new ArrayList<String>();
+	private static BlockingQueue<String> items= new ArrayBlockingQueue<String>(10); 
 	private static Lock donorsLock = new ReentrantLock();
 	public static Lock printer = new ReentrantLock();
 	public static Lock recipients = new ReentrantLock();
@@ -41,27 +44,23 @@ public class Chairman implements Runnable{
 		}
 	}
 	
-	public static Boolean giveItem(Donor donor) throws InterruptedException{
+	public static void giveItem(Donor donor) throws InterruptedException{
 		
 		donorsLock.lock();
-		if (items.size() >= 10) {
-			donorsLock.unlock();
-			return false;
-		}
 		if (donor.items.isEmpty()){
 			conditionD.await();
 		}
 		else{
-			items.add(donor.items.get(0));
+			items.offer(donor.items.get(0), 5, TimeUnit.SECONDS);
 			donor.items.remove(0);
 		}
 		
 		donorsLock.unlock();
 		
-		return true;
 	}
 	
 	public static Boolean registration(Recipient rec) throws InterruptedException{
+		
 		recipients.lock();
 		if (users.size() >= 10){
 			recipients.unlock();
@@ -82,6 +81,7 @@ public class Chairman implements Runnable{
 	}
 	
 	public void auction() throws InterruptedException{
+		
 		if (items.isEmpty()){
 			TimeUnit.SECONDS.sleep(5);
 		}
@@ -99,16 +99,15 @@ public class Chairman implements Runnable{
 		
 		recipients.lock();
 		if (users.isEmpty()) {
-			System.out.println("There is no winner for " + items.get(0));
-			items.remove(0);
+			System.out.println("There is no winner for " + items.take());
 		}
 		else{
 			int nr = findWinner.nextInt(users.size());
-			System.out.println("Winner for auction " + items.get(0) + " is " + users.get(nr).name);
-			users.get(nr).win(items.get(0));
+			String item = items.take();
+			System.out.println("Winner for auction " + item + " is " + users.get(nr).name);
+			users.get(nr).win(item);
 			users.clear();
 			condition.signalAll();
-			items.remove(0);
 			users.clear();
 			
 		}
