@@ -5,15 +5,19 @@ import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jms.Destination;
+
 public class PointOfSale {
+	
+	
 
     private Map<String, Double> products = new HashMap<String, Double>();
 
-    private Reporting reporting;
+    //private Reporting reporting;
 
-    public PointOfSale(Reporting reporting) {
+    /*public PointOfSale(Reporting reporting) {
         this.reporting = reporting;
-    }
+    }*/
 
     public void initProducts(Map<String, Double> products) {
         this.products = products;
@@ -29,6 +33,6 @@ public class PointOfSale {
         Preconditions.checkState(!products.isEmpty());
 
         Double price = products.get(name.toUpperCase());
-        reporting.updateReport(name, price);
+        //reporting.updateReport(name, price);
     }
 }

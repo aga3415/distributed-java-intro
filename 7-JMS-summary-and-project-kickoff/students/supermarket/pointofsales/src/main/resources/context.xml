@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           ">
+
+    <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+
+    <bean id="reporting" class="org.apache.activemq.command.ActiveMQQueue">
+        <constructor-arg value="reporting"/>
+    </bean>
+
+    <bean id="POS" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="POS"/>
+    </bean>
+    
+
+    <bean id="messageListenerContainer" class="org.springframework.jms.listener.SimpleMessageListenerContainer">
+        <property name="messageListener" ref="pointOfSalesListener"/>
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="POS"/>
+    </bean>
+
+    <!-- consumer -->
+    <bean id="pointOfSalesListener" class="pl.edu.amu.dji.jms.lab4.PointOfSaleJMSListener">
+    	<property name="products" ref ="products"/> 
+    </bean>
+    
+    <!-- producer -->
+    <bean id="pointOfSalesSender" class="pl.edu.amu.dji.jms.lab4.PointOfSalesJMSSender">
+    	<constructor-arg ref="pointOfSalesListener"/>
+    	<property name="jmsTemplate" ref="jmsTemplate"/>
+        <property name="reporting" ref="reporting"/>
+    	<property name="products" ref="products"/> 
+    </bean>
+    
+    <bean id="products" class="java.util.HashMap">
+    <constructor-arg>
+        <map key-type="java.lang.String" value-type="java.lang.Double">
+        </map>
+    </constructor-arg>
+</bean>
+    
+</beans>
