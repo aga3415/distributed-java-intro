@@ -10,11 +10,14 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 import com.google.common.base.Preconditions;
+import com.rits.cloning.Cloner;
 
 public class WarehouseJMS /*implements MessageListener*/{
 	
 	private JmsTemplate jmsTemplate;
-	public static final Map<String, Double> PRODUCTS;
+	private final Cloner cloner = new Cloner();
+	private static final Map<String, Double> PRODUCTS;
+	private Destination POS;
 
     static {
         PRODUCTS = new HashMap<String, Double>();
@@ -22,12 +25,9 @@ public class WarehouseJMS /*implements MessageListener*/{
         PRODUCTS.put("B", 9.99);
     }
 
-
     public void setJmsTemplate(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
     }
-    
-    private Destination POS;
     
     public void setPOS(Destination POS) {
         this.POS = POS;
@@ -40,14 +40,15 @@ public class WarehouseJMS /*implements MessageListener*/{
         	oldPrice = PRODUCTS.get(name);
         	
         }catch(NullPointerException ex){
-        	System.out.println("New product will be created");
+        	System.out.println("New product is creating");
         }
         PRODUCTS.put(name, price);
         
         informPOSaboutPriceChange(name, price);
-        //jeśli cena jest taka sama i tak informuje sklepy
+        
      
     }
+    
     
     public void informPOSaboutPriceChange(final String name, final Double price){
     	
@@ -56,7 +57,8 @@ public class WarehouseJMS /*implements MessageListener*/{
     		public Message createMessage(Session session) throws JMSException {
 		        
     			MapMessage priceIsChanging = session.createMapMessage();
-		        priceIsChanging.setString("type", "price change");
+		        
+    			priceIsChanging.setString("type", "price change");
 		        priceIsChanging.setString("name", name);
 		        priceIsChanging.setDouble("price", price);
 
@@ -72,8 +74,9 @@ public class WarehouseJMS /*implements MessageListener*/{
 		    public Message createMessage(Session session) throws JMSException {
 		    	
 		        MapMessage listIsSending = session.createMapMessage();
+		        
 		        listIsSending.setString("type", "full price list");
-		        listIsSending.setObject("list", PRODUCTS);
+		        listIsSending.setObject("list", cloner.deepClone((Map<String, Double>) PRODUCTS));
 		        
 		        return listIsSending;
 		    }

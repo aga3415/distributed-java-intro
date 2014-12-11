@@ -1,6 +1,6 @@
 package pl.edu.amu.dji.jms.lab4;
 
-import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import org.springframework.context.ApplicationContext;
@@ -17,7 +17,6 @@ public class WarehouseApp {
         while (!command.equals("CLOSE")){
         	System.out.println("What do you want to do?"
         			+ "\n- CLOSE the warehouse"
-        			+ "\n- SEND PRICE CHANGE massage"
         			+ "\n- SEND FULL PRODUCTS LIST"
         			+ "\n- CHANGE PRICE" );
         	
@@ -25,15 +24,23 @@ public class WarehouseApp {
         	
 			if (command.equals("CHANGE PRICE")){
         		System.out.println("Give the product's name and price: ");
-        		if (read.hasNext()){
+        		
+        		try{
         			wh.changePrice(read.next(), read.nextDouble());
-        		}        		
+        		}catch(InputMismatchException ex){
+        			System.out.println("Data is incorrect");
+        		}
+        		      		
         	}else{
         		if(command.equals("SEND FULL PRODUCTS LIST")){
         			wh.sendFullProductList();
         		}
+        		else{
+        			System.out.println("Invalid command");
+        		}
         	}
 
-        }     
+        }
+        read.close();
     }
 }

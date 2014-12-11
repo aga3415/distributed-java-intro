@@ -33,7 +33,7 @@ public class ReportingJMS implements MessageListener{
 	            Double price = mapMessage.getDouble("price");
 	            updateReport(name, price);
 	            
-	            System.out.println("POS " + mapMessage.getString("id")+ " sales: " + name + " for " + price);
+	            System.out.println("sales: " + name + " for " + price);
 	            
 	        } catch (JMSException ex){
 	            throw new IllegalStateException(ex);
@@ -42,6 +42,7 @@ public class ReportingJMS implements MessageListener{
 	}
 	
 	public void printReport(){
+		System.out.println("Report: ");
 		Set<String> keySet = PRODUCTS.keySet();
 		for (String name: keySet){
 			System.out.println(name + " " + PRODUCTS.get(name));

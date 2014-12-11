@@ -30,7 +30,6 @@
 
     <!-- consumer -->
     <bean id="pointOfSalesListener" class="pl.edu.amu.dji.jms.lab4.PointOfSaleJMSListener">
-    	<property name="products" ref ="products"/> 
     </bean>
     
     <!-- producer -->
@@ -38,14 +37,7 @@
     	<constructor-arg ref="pointOfSalesListener"/>
     	<property name="jmsTemplate" ref="jmsTemplate"/>
         <property name="reporting" ref="reporting"/>
-    	<property name="products" ref="products"/> 
     </bean>
     
-    <bean id="products" class="java.util.HashMap">
-    <constructor-arg>
-        <map key-type="java.lang.String" value-type="java.lang.Double">
-        </map>
-    </constructor-arg>
-</bean>
     
 </beans>

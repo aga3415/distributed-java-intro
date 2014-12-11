@@ -24,5 +24,12 @@
             <artifactId>common</artifactId>
             <version>${parent.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>uk.com.robust-it</groupId>
+            <artifactId>cloning</artifactId>
+            <version>1.9.1</version>
+        </dependency>
+    
     </dependencies>
 </project>
